@@ -1,0 +1,17 @@
+<launch>
+  <node pkg="apriltags_ros" type="apriltag_detector_node" name="apriltag_detector" output="screen">
+    <rosparam param="tag_descriptions">[
+      {id: 0, size: 0.163513, frame_id: b_frame},
+      {id: 1, size: 0.163513, frame_id: a_frame},
+      {id: 2, size: 0.163513},
+      {id: 3, size: 0.163513},
+      {id: 4, size: 0.163513},
+      {id: 5, size: 0.163513}]
+      
+      <param name="focal_length_px" value="700"/>
+      
+      <param name="tag_size_cm" value="16"/> 
+    </rosparam>
+  </node>
+</launch>
+

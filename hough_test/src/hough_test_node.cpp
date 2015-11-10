@@ -1,7 +1,14 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/opencv.hpp"
+#include "opencv2/highgui/highgui_c.h"
+#include "cvplot.h"
+//#include <koolplot.h>
 
 #include <iostream>
+//#include
+//#define rowPtr(imagePtr, dataType, lineIndex) \
+	//    (dataType *)(imagePtr->imageData + (lineIndex) * imagePtr->widthStep)
 
 using namespace cv;
 using namespace std;
@@ -61,6 +68,18 @@ int main(int argc, char** argv)
  cv::resizeWindow("detectline test", 500,800);
  imshow("source", src);
  imshow("detectline test", cdst);
+
+ //int the_line = 100;
+ unsigned char  pb[10]= {1,2,3,4,5,6,7,8,9,10};
+ int width = 0;
+
+// *width = 0;
+ //template<typename T>
+// const * p;
+
+ CvPlot::plot("RGB", pb, 10, 1, 255, 0, 0);
+ //CvPlot::label("B");
+
 
  waitKey();
 

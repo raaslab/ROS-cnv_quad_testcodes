@@ -1,12 +1,17 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(hough_test)
+project(test_cvplot)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS  cv_bridge  image_transport  roscpp  sensor_msgs  std_msgs)
+find_package(catkin REQUIRED COMPONENTS
+  cv_bridge
+  image_transport
+  roscpp
+  sensor_msgs
+  std_msgs
+)
 find_package(OpenCV REQUIRED)
-
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -98,7 +103,7 @@ find_package(OpenCV REQUIRED)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-#  LIBRARIES hough_test
+#  LIBRARIES test_cvplot
 #  CATKIN_DEPENDS cv_bridge image_transport roscpp sensor_msgs std_msgs
 #  DEPENDS system_lib
 )
@@ -115,26 +120,26 @@ include_directories(include
 )
 
 ## Declare a C++ library
-# add_library(hough_test
-#   src/${PROJECT_NAME}/hough_test.cpp
+# add_library(test_cvplot
+#   src/${PROJECT_NAME}/test_cvplot.cpp
 # )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(hough_test ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(test_cvplot ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
- add_executable(hough_test_node  src/cvplot.cpp src/hough_test_node.cpp)
+add_executable(test_cvplot_node  src/cvplot.cpp src/plot_sample.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(hough_test_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(test_cvplot_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
- target_link_libraries(hough_test_node
+ target_link_libraries(test_cvplot_node
    ${catkin_LIBRARIES}
-    ${OpenCV_LIBS}
+   ${OpenCV_LIBS} 
  )
 
 #############
@@ -152,7 +157,7 @@ include_directories(include
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS hough_test hough_test_node
+# install(TARGETS test_cvplot test_cvplot_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -177,7 +182,7 @@ include_directories(include
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_hough_test.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_test_cvplot.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

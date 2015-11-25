@@ -1,5 +1,6 @@
 #include "ros/ros.h"
 #include "beginner_tutorials/AddTwoInts.h"
+//#include "mavros_msgs/Waypoint.h"
 
 bool add(beginner_tutorials::AddTwoInts::Request  &req,
          beginner_tutorials::AddTwoInts::Response &res)
@@ -16,6 +17,10 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
 
   ros::ServiceServer service = n.advertiseService("add_two_ints", add);
+
+  //mavros_msgs::Waypoint wp[1];
+
+
   ROS_INFO("Ready to add two ints.");
   ros::spin();
 

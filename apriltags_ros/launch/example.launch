@@ -7,10 +7,8 @@
       {id: 3, size: 0.163513},
       {id: 4, size: 0.163513, frame_id: d_frame},
       {id: 5, size: 0.163513}]
-      
-      <param name="focal_length_px" value="700"/>
-      
-      <param name="tag_size_cm" value="16"/> 
+        
+     <param name="tag_size_cm" value="16.4"/> 
     </rosparam>
   </node>
 </launch>

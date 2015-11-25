@@ -12,6 +12,27 @@
 #include <AprilTags/Tag36h9.h>
 #include <AprilTags/Tag36h11.h>
 #include <XmlRpcException.h>
+#include "opencv2/core/core.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include <ros/ros.h>
+#include <image_transport/image_transport.h>
+#include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/image_encodings.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <geometry_msgs/Twist.h>
+#include <geometry_msgs/Pose2D.h>
+#include <std_msgs/Bool.h>
+#include "opencv2/calib3d/calib3d.hpp"
+#include "opencv2/features2d/features2d.hpp"
+//#include "opencv2/nonfree/nonfree.hpp"
+#include "structures.h"
+#include <iostream>
+
+
+using namespace cv;
+using namespace std;
 
 namespace apriltags_ros{
 
@@ -34,10 +55,12 @@ AprilTagDetector::AprilTagDetector(ros::NodeHandle& nh, ros::NodeHandle& pnh): i
 
   AprilTags::TagCodes tag_codes = AprilTags::tagCodes36h11;
   tag_detector_= boost::shared_ptr<AprilTags::TagDetector>(new AprilTags::TagDetector(tag_codes));
-  image_sub_ = it_.subscribeCamera("/usb_cam/image_raw", 1, &AprilTagDetector::imageCb, this);
+  image_sub_ = it_.subscribeCamera("/ardrone/front/image_rect_color", 1, &AprilTagDetector::imageCb, this);
   image_pub_ = it_.advertise("tag_detections_image", 1);
   detections_pub_ = nh.advertise<AprilTagDetectionArray>("tag_detections", 1);
   pose_pub_ = nh.advertise<geometry_msgs::PoseArray>("tag_detections_pose", 1);
+	//cv::namedWindow("image_gray", CV_WINDOW_NORMAL);
+	//cv::resizeWindow("image_gray", 500,800);
 }
 AprilTagDetector::~AprilTagDetector(){
   image_sub_.shutdown();
@@ -93,6 +116,29 @@ void AprilTagDetector::imageCb(const sensor_msgs::ImageConstPtr& msg,const senso
     tag_pose.pose.orientation.w = rot_quaternion.w();
     tag_pose.header = cv_ptr->header;
 
+  //  Point2f vtx;
+  //  vtx.x=tag_pose.pose.position.x;
+  //  vtx.y=tag_pose.pose.position.y;
+
+   //  Mat result=gray.clone();
+    //while(1)
+  //  {
+  //  	circle(result,vtx,10, Scalar(0,0,255), 2, CV_AA);
+   //    	imshow("image_gray",result);
+   // 	cv::waitKey(0);
+   // }
+//     imshow("result",result);
+
+    double u = fx*(tag_pose.pose.position.x/tag_pose.pose.position.z) + px;
+    double v = fy*(tag_pose.pose.position.y/tag_pose.pose.position.z) + py;
+
+   //double ximg= u+ px;
+   //double yimg= v+ py;
+
+    cout<< "u = "<< u <<"  v = "<< v << endl;
+
+    tag_pose.pose.position.x = u;
+    tag_pose.pose.position.y = v;
     AprilTagDetection tag_detection;
     tag_detection.pose = tag_pose;
     tag_detection.id = detection.id;
@@ -132,12 +178,13 @@ std::map<int, AprilTagDescription> AprilTagDetector::parse_tag_descriptions(XmlR
       frame_name_stream << "tag_" << id;
       frame_name = frame_name_stream.str();
     }
+
+
     AprilTagDescription description(id, size, frame_name);
     ROS_INFO_STREAM("Loaded tag config: "<<id<<", size: "<<size<<", frame_name: "<<frame_name);
     descriptions.insert(std::make_pair(id, description));
   }
   return descriptions;
 }
-
 
 }

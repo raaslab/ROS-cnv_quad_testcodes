@@ -55,7 +55,7 @@ AprilTagDetector::AprilTagDetector(ros::NodeHandle& nh, ros::NodeHandle& pnh): i
 
   AprilTags::TagCodes tag_codes = AprilTags::tagCodes36h11;
   tag_detector_= boost::shared_ptr<AprilTags::TagDetector>(new AprilTags::TagDetector(tag_codes));
-  image_sub_ = it_.subscribeCamera("/ardrone/front/image_rect_color", 1, &AprilTagDetector::imageCb, this);
+  image_sub_ = it_.subscribeCamera("/ardrone/front/image_raw", 1, &AprilTagDetector::imageCb, this);
   image_pub_ = it_.advertise("tag_detections_image", 1);
   detections_pub_ = nh.advertise<AprilTagDetectionArray>("tag_detections", 1);
   pose_pub_ = nh.advertise<geometry_msgs::PoseArray>("tag_detections_pose", 1);
@@ -129,16 +129,16 @@ void AprilTagDetector::imageCb(const sensor_msgs::ImageConstPtr& msg,const senso
    // }
 //     imshow("result",result);
 
-    double u = fx*(tag_pose.pose.position.x/tag_pose.pose.position.z) + px;
-    double v = fy*(tag_pose.pose.position.y/tag_pose.pose.position.z) + py;
+  //  double u = fx*(tag_pose.pose.position.x/tag_pose.pose.position.z) + px;
+  //  double v = fy*(tag_pose.pose.position.y/tag_pose.pose.position.z) + py;
 
    //double ximg= u+ px;
    //double yimg= v+ py;
 
-    cout<< "u = "<< u <<"  v = "<< v << endl;
+    //cout<< "u = "<< u <<"  v = "<< v << endl;
 
-    tag_pose.pose.position.x = u;
-    tag_pose.pose.position.y = v;
+    //tag_pose.pose.position.x = ;//u;
+    //tag_pose.pose.position.y = ;//v;
     AprilTagDetection tag_detection;
     tag_detection.pose = tag_pose;
     tag_detection.id = detection.id;

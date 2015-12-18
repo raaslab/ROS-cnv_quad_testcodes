@@ -12,22 +12,13 @@ using namespace cv;
 using namespace std;
 
 int hough_slider_max=200;
-int canny1_slider_max=200;
+int canny1_slider_max=100;
 int canny2_slider_max=500;
 
-int Hough_slider=60;
-int CannyThres1=115;
-int CannyThres2=210;
+int Hough_slider=50;
+int CannyThres1=50;
+int CannyThres2=200;
 int first_image_frame=1;
-
-unsigned long int loop=0;
-
-float Xout,Yout;
-//Low pass filter parameters
-float sampling_time=1.0;
-float cutoff_freq=1/0.04;
-float alpha;
-
 
 static const std::string OPENCV_WINDOW = "Image window";
 
@@ -47,7 +38,7 @@ public:
             {
 		       // Subscrive to input video feed and publish output video feed
 		       image_sub_ = it_.subscribe("/ardrone/front/image_rect", 1,&codebridge::imageCb, this);
-		       vanish_pub = nh_.advertise<geometry_msgs::Pose2D>("/vanishing_point", 1);
+		       vanish_pub = nh_.advertise<geometry_msgs::Pose2D>("/vanishing_point", 1);;
 
 		       //image_pub_ = it_.advertise("/codebridge/output_video", 1);
 		       cv::namedWindow(OPENCV_WINDOW);
@@ -60,20 +51,20 @@ public:
 
 	void imageCb(const sensor_msgs::ImageConstPtr& msg)
 	{
-//		if (first_image_frame)
-//		{
-//			string filename_apr = "/home/ashishkb/Desktop/vanish_vid.avi";
-//			int fcc = CV_FOURCC('D','I','V','3');
-//			int fps = 10;
-//			cv::Size frameSize(640,360);
-//			writer_vanish = VideoWriter(filename_apr,fcc,fps,frameSize);
-//
-//			while (!writer_vanish.isOpened()) {
-//			cout<<"ERROR OPENING FILE FOR WRITE"<<endl; }
-//
-//
-//			first_image_frame = 0;
-//		}
+		if (first_image_frame)
+		{
+			string filename_apr = "/home/ashishkb/Desktop/vanish_vid.avi";
+			int fcc = CV_FOURCC('D','I','V','3');
+			int fps = 10;
+			cv::Size frameSize(640,360);
+			writer_vanish = VideoWriter(filename_apr,fcc,fps,frameSize);
+
+			while (!writer_vanish.isOpened()) {
+			cout<<"ERROR OPENING FILE FOR WRITE"<<endl; }
+
+
+			first_image_frame = 0;
+		}
 		cv_bridge::CvImagePtr cv_ptr;
 		 try
          {
@@ -87,16 +78,10 @@ public:
 
 //////////////////////////////////////MY CODE///////////////////////////////////////////////////
 
-		 clock_t begin = clock();
-
 		 Mat gra,The_Vid;
 
-		The_Vid=cv_ptr->image.clone();
-
-		//IMAGE SHARPENING
-		//GaussianBlur( cv_ptr->image,cv_ptr-> image, Size( 3, 3 ), 0, 0 );
-		GaussianBlur( cv_ptr->image,cv_ptr-> image, Size( 0,0 ), 3 , 3);
-		addWeighted( The_Vid, 1.5,  cv_ptr->image, -0.5, 0, cv_ptr->image);
+		The_Vid=cv_ptr->image;
+		GaussianBlur( cv_ptr->image,cv_ptr-> image, Size( 5, 5 ), 0, 0 );
 		 cvtColor( cv_ptr->image, gra, CV_BGR2GRAY );
 
 		////trackbar
@@ -224,7 +209,7 @@ public:
 
 
 
-if(ct>2)
+if(ct>6)
 {
 		      //Part of code to find the best line fit
 		      srand(time(0));
@@ -310,8 +295,8 @@ if(ct>2)
 		        	   }
 		           }
 		          // cout<<inlierind<<endl;
-
 		      //Find the number of inliers
+
 
 		           numinlier=0;
 		           for(int i=0; i<numofpt;i++)
@@ -403,24 +388,6 @@ if(ct>2)
 		      //Finding the values of (x,y) from the given pair of (b1,m1) and (b2,m2)
 				 XYpoints= abs((1/(vy))*mpt*bpt);//this array stores the (x,y) value of vanishing point
 
-				 //LOW PASS FILTER
-				 loop=loop+1;
-
-
-										 if(loop>1)
-										 {
-										 alpha = sampling_time/(sampling_time+(1/cutoff_freq*2*3.14));
-
-										 Xout = abs(alpha*Xout) + (1-alpha)*XYpoints.at<float>(0,0);
-										 Yout = abs(alpha*Yout) + (1-alpha)*XYpoints.at<float>(1,0);
-										 }
-										 else if(loop<=1)
-										 {
-										 Xout=XYpoints.at<float>(0,0);
-										 Yout=XYpoints.at<float>(1,0);
-
-										 }
-
 
 
 		      //displaying the vanishing point
@@ -435,18 +402,14 @@ if(ct>2)
 
 				 pt3.x = 0;
 				 pt3.y = 0;
-				 //pt4.x = cvRound(XYpoints.at<float>(0,0));
-				 pt4.x = cvRound(Xout);
+				 pt4.x = cvRound(XYpoints.at<float>(0,0));
 				 pt4.y = 0;
-				 //pt5.x = cvRound(XYpoints.at<float>(0,0));
-				 pt5.x = cvRound(Xout);
-				 pt5.y = rows;
+		         pt5.x = cvRound(XYpoints.at<float>(0,0));
+		         pt5.y = rows;
 		         pt6.x = 0;
-		         pt6.y = cvRound(Yout);
-		         //pt6.y = cvRound(XYpoints.at<float>(1,0));
-				 pt7.x = cols;
-				 pt7.y = cvRound(Yout);
-		         //pt7.y = cvRound(XYpoints.at<float>(1,0));
+		         pt6.y = cvRound(XYpoints.at<float>(1,0));
+		         pt7.x = cols;
+		         pt7.y = cvRound(XYpoints.at<float>(1,0));
 
 
 				 line( cv_ptr->image, pt4, pt5, Scalar(0,0,255), 2, CV_AA);
@@ -455,33 +418,19 @@ if(ct>2)
 
 		    	// imshow("vanish point Image",cv_ptr->image);
 
-				 //vanish_point.x  = cvRound(XYpoints.at<float>(0,0));
-				 //vanish_point.y  = cvRound(XYpoints.at<float>(1,0));
-				 vanish_point.x  = cvRound(Xout);
-				 vanish_point.y  = cvRound(Yout);
-				 if((Xout<cols)&&(Yout<rows))
-				 {
-
+				 vanish_point.x  = cvRound(XYpoints.at<float>(0,0));
+				 vanish_point.y  = cvRound(XYpoints.at<float>(1,0));
 
 				 vanish_pub.publish(vanish_point);
-				 }
+
 				 cv::imshow(OPENCV_WINDOW, cv_ptr->image);
-				// writer_vanish.write(cv_ptr->image);
-
-				 clock_t end = clock();
-				 double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-
-				// cout<<"\n"<<elapsed_secs<<"\n";
-
-
-
-
+				 writer_vanish.write(cv_ptr->image);
 				 cv::waitKey(3);
            }
 		   else
 		   {
 			   cv::imshow(OPENCV_WINDOW, cv_ptr->image);
-			  // writer_vanish.write(cv_ptr->image);
+			   writer_vanish.write(cv_ptr->image);
 			   cv::waitKey(3);
 		   }
 
